@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <script src="script.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Pangolin&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>Tic-Tac-Toe</h1>
+
+    <div class="scoreboard" id="scoreboard">
+        <p id="playerX">Player X: <span id="scoreX">0</span></p>
+        <p id="playerO">Player O: <span id="scoreO">0</span></p>
+    </div>
+
+    <div id="popup" class="popup">
+        <p>Welcome to Tic-Tac-Toe</p>
+    </div>
+
+    <div id="overlay" class="overlay"></div>
+
+    <div id="gameModeSelector" class="popup">
+        <p>Choose Game Mode</p>
+        <button id="twoPlayerMode">2 Player Mode</button>
+        <button id="cpuMode">CPU Mode</button>
+
+        <div  id="cpuModeSelector" style="display: none;">
+            <select id="cpuDifficulty">
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+            <button id="startGameCpuMode">Start Game</button>
+        </div>        
+    </div>
+
+    <div id="currentPlayerText" style="font-size: 1.2rem; margin-top: 20px;">
+        <p><span id="currentPlayer">X</span> to play</p>
+    </div>
+
+    <div id="board" class="board">
+        <div class="row">
+            <div class="cell" id="cell-1"><button data-row="0" data-col="0"></button></div><br>
+            <div class="cell" id="cell-2"><button data-row="0" data-col="1"></button></div><br>
+            <div class="cell" id="cell-3"><button data-row="0" data-col="2"></button></div><br>
+        </div>
+        <div class="row">
+            <div class="cell" id="cell-4"><button data-row="1" data-col="0"></button></div><br>
+            <div class="cell" id="cell-5"><button data-row="1" data-col="1"></button></div><br>
+            <div class="cell" id="cell-6"><button data-row="1" data-col="2"></button></div><br>
+        </div>
+        <div class="row">
+            <div class="cell" id="cell-7"><button data-row="2" data-col="0"></button></div><br>
+            <div class="cell" id="cell-8"><button data-row="2" data-col="1"></button></div><br>
+            <div class="cell" id="cell-9"><button data-row="2" data-col="2"></button></div><br>
+        </div>
+    </div>
+
+    <div class="winner-popup" id="winnerPopup">
+        <p id="winnerText"></p>
+        <button id="newGameButtonWinner">Restart</button>
+    </div>
+    <div class="winner-popup" id="drawPopup">
+        <p id="drawText">Draw :(</p>
+        <button id="newGameButtonDraw">Restart</button>
+    </div>
+</body>
+</html>
