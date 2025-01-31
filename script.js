@@ -263,6 +263,33 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function getEmptyCells() {
+        const emptyCells = [];
+        for (let row = 0; row < 3; row++) {
+            for (let col = 0; col < 3; col++) {
+                if (boardState[row][col] == '') {
+                    emptyCells.push([row, col]);
+                }
+            }
+        }
+        return emptyCells;
+    }
+
+    function makeMove(row, col) {
+        const button = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+        if (button && button.innerHTML.trim() === '') {
+            filledButtons++;
+            boardState[row][col] = 'O';
+            button.innerHTML = 'O';
+            button.classList.add('O');
+            button.disabled = true;
+    
+            checkWinner();
+            checkDraw();
+        }
+    }
+
+
     function cpuMove() {
         if (gameEnded) return;
 
@@ -284,39 +311,6 @@ document.addEventListener('DOMContentLoaded', function() {
         updateCurrentPlayerText();
     }
 
-    function mediumCpuMove() {
-        const emptyCells = getEmptyCells();
-        const blockingMove = findBlockingMove('X');
-        if (blockingMove) {
-            makeMove(blockingMove[0], blockingMove[1]);
-            currentPlayer = 'X';
-        } else {
-            const randomIndex = Math.floor(Math.random() * emptyCells.length);
-            const [row, col] = emptyCells[randomIndex];
-            makeMove(row, col);
-            currentPlayer = 'X';
-        }
-    }
-
-    function hardCpuMove() {
-        const [row, col] = bestMove();
-        makeMove(row, col);
-        currentPlayer = 'X';
-        updateCurrentPlayerText();
-    }
-
-    function getEmptyCells() {
-        const emptyCells = [];
-        for (let row = 0; row < 3; row++) {
-            for (let col = 0; col < 3; col++) {
-                if (boardState[row][col] == '') {
-                    emptyCells.push([row, col]);
-                }
-            }
-        }
-        return emptyCells;
-    }
-
     function findBlockingMove(player) {
         for (const combination of winningCombinations) {
             const [a, b, c] = combination;
@@ -335,38 +329,58 @@ document.addEventListener('DOMContentLoaded', function() {
         return null;
     }
 
+    function mediumCpuMove() {
+        const emptyCells = getEmptyCells();
+        const blockingMove = findBlockingMove('X');
+        if (blockingMove) {
+            makeMove(blockingMove[0], blockingMove[1]);
+            currentPlayer = 'X';
+        } else {
+            const randomIndex = Math.floor(Math.random() * emptyCells.length);
+            const [row, col] = emptyCells[randomIndex];
+            makeMove(row, col);
+            currentPlayer = 'X';
+        }
+    }
+
     function minimax(boardState, depth, isMaximizing) {
+        const winner = checkWinner();
+        if (winner) {
+            return winner === 'O' ? 10 - depth : depth - 10;
+        }
+
         const emptyCells = getEmptyCells();
         if (emptyCells.length === 0) {
             return 0;
         }
 
-        const winner = checkWinner();
-        if (winner) {
-            return winner === 'O' ? 10 - depth : depth -10;
-        }
-
         let bestScore = isMaximizing ? -Infinity : Infinity;
+
         for (let i = 0; i < emptyCells.length; i++) {
             const [row, col] = emptyCells[i];
             boardState[row][col] = isMaximizing ? 'O' : 'X';
+
             const score = minimax(boardState, depth + 1, !isMaximizing);
+
             boardState[row][col] = '';
         
             bestScore = isMaximizing ? Math.max(bestScore, score) : Math.min(bestScore, score);
         }
+
         return bestScore;
     }
         
     function bestMove() {
         let bestScore = -Infinity;
-        let move;
-        
+        let move = null;
+
         const emptyCells = getEmptyCells();
+        
         for (let i = 0; i < emptyCells.length; i++) {
             const [row, col] = emptyCells[i];
             boardState[row][col] = 'O';
             const score = minimax(boardState, 0, false);
+
             boardState[row][col] = '';
         
             if (score > bestScore) {
@@ -376,20 +390,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         return move;
-    
+    }
 
-    function makeMove(row, col) {
-        const button = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-        if (button && button.innerHTML.trim() === '') {
-            filledButtons++;
-            boardState[row][col] = 'O';
-            button.innerHTML = 'O';
-            button.classList.add('O');
-            button.disabled = true;
-    
-            checkWinner();
-            checkDraw();
-            }
+    function hardCpuMove() {
+        const move = bestMove();
+
+        if (move) {
+            const [row, col] = move;
+            makeMove(row, col);
+            currentPlayer = 'X';
+            updateCurrentPlayerText();
         }
     }
 });
