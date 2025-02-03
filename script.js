@@ -110,8 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const [x3, y3] = c;
     
             if (boardState[x1][y1] && boardState[x1][y1] === boardState[x2][y2] && boardState[x2][y2] === boardState[x3][y3]) {
-                showWinner(boardState[x1][y1]);
-                return true;
+                return boardState[x1][y1];
             }
         }
         return null;
@@ -245,10 +244,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 button.innerHTML = currentPlayer;
                 button.classList.add(currentPlayer);
 
-                if (checkWinner()) {
+                const winner = checkWinner();
+                if (winner) {
+                    showWinner(winner);
                     return;
                 }
-                    checkDraw();
+
+                checkDraw();
 
                 currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
                 updateCurrentPlayerText();
@@ -300,6 +302,16 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (cpuDifficulty === 'hard') {
             hardCpuMove();
         }
+
+        const winner = checkWinner();
+        if (winner) {
+            showWinner(winner);
+            return;
+        }
+
+        checkDraw();
+        currentPlayer = 'X';
+        updateCurrentPlayerText();
     }
 
     function easyCpuMove() {
@@ -345,23 +357,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function minimax(boardState, depth, isMaximizing) {
         const winner = checkWinner();
-        if (winner) {
-            return winner === 'O' ? 10 - depth : depth - 10;
-        }
-
-        const emptyCells = getEmptyCells();
-        if (emptyCells.length === 0) {
-            return 0;
-        }
+        if (winner === 'O') return 10 - depth;
+        if (winner === 'X') return depth - 10;
+        if (getEmptyCells().length === 0) return 0;
 
         let bestScore = isMaximizing ? -Infinity : Infinity;
 
-        for (let i = 0; i < emptyCells.length; i++) {
-            const [row, col] = emptyCells[i];
+        for (let [row, col] of getEmptyCells()) {
             boardState[row][col] = isMaximizing ? 'O' : 'X';
-
             const score = minimax(boardState, depth + 1, !isMaximizing);
-
             boardState[row][col] = '';
         
             bestScore = isMaximizing ? Math.max(bestScore, score) : Math.min(bestScore, score);
@@ -374,13 +378,9 @@ document.addEventListener('DOMContentLoaded', function() {
         let bestScore = -Infinity;
         let move = null;
 
-        const emptyCells = getEmptyCells();
-        
-        for (let i = 0; i < emptyCells.length; i++) {
-            const [row, col] = emptyCells[i];
+        for (let [row, col] of getEmptyCells()) {
             boardState[row][col] = 'O';
             const score = minimax(boardState, 0, false);
-
             boardState[row][col] = '';
         
             if (score > bestScore) {
@@ -392,7 +392,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return move;
     }
 
-    function hardCpuMove() {
+function hardCpuMove() {
         const move = bestMove();
 
         if (move) {
